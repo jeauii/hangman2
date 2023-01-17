@@ -26,13 +26,13 @@ def generate_output(key):
     return output
 
 def main():
-    x_train, y_train = [], []
+    x, y = [], []
     for line in sys.stdin:
         split = line.split(None, 2)
-        x_train.append(generate_input(split[0]))
-        y_train.append(generate_output(split[1]))
+        x.append(generate_input(split[0]))
+        y.append(generate_output(split[1]))
 
-    np.savez_compressed(sys.argv[1], x=x_train, y=y_train)
+    np.savez_compressed(sys.argv[1], x=x, y=y)
 
 if __name__ == '__main__':
     main()

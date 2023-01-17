@@ -19,7 +19,8 @@ def main():
 
     model = tf.keras.models.load_model(sys.argv[1])
 
-    count = (0, 0)
+    count = 0
+    total, match = 0, 0
     for line in sys.stdin:
         try:
             word = get_word(line)
@@ -31,26 +32,34 @@ def main():
         lives = HANGMAN_LIVES
         guesses = ''
         cipher = '.' * len(word)
-        while '.' in cipher and lives != 0:
-            prob = model(np.asarray([generate_input(cipher)]))[0]
-            for i in reversed(np.argsort(prob)):
+        while '.' in cipher and lives > 0:
+            pred = model(np.asarray([generate_input(cipher)]))[0]
+
+            for i in reversed(np.argsort(pred)):
                 letter = chr(i + 97)
                 if letter in guesses:
                     continue
-                guesses = guesses + letter
-                print(f"{cipher} => {letter} ({lives})")
-                print(''.join('{:5}'.format(ch) for ch in string.ascii_lowercase))
-                print(''.join('{:4.0f}%'.format(p * 100) for p in prob))
-                count = (count[0] + 1, count[1] + 1 if letter in word else count[1])
+
+                print(f"{cipher} => {letter} {guesses} ({lives})")
+                print(''.join('{:5}'.format(l) for l in string.ascii_lowercase))
+                print(''.join('{:4.0f}%'.format(p * 100) for p in pred))
+
+                guesses += letter
                 if letter in word:
-                    cipher = ''.join(ch if ch == letter else cipher[i] for i, ch in enumerate(word))
+                    cipher = ''.join(l if l == letter else ch for l, ch in zip(word, cipher))
                     break
                 else:
                     lives -= 1
                     if lives == 0:
                         break
+
         print('.' not in cipher)
-    print(f'{count[1]}/{count[0]}')
+
+        count += 1
+        total += len(guesses)
+        match += len(guesses) + lives - HANGMAN_LIVES
+
+    print(f'{count} {match}/{total}')
 
 if __name__ == '__main__':
     main()

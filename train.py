@@ -6,8 +6,8 @@ from generate import WORD_LEN
 
 def main():
     data = np.load(sys.argv[2])
-    x_train = data['x']
-    y_train = data['y']
+    x = data['x']
+    y = data['y']
 
     try:
         model = tf.keras.models.load_model(sys.argv[1])
@@ -22,7 +22,7 @@ def main():
     #model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['binary_accuracy'])
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 
-    model.fit(x_train, y_train, batch_size=256, epochs=int(sys.argv[3]))
+    model.fit(x, y, batch_size=256, epochs=int(sys.argv[3]))
 
     model.save(sys.argv[1])
 
